@@ -1,0 +1,14 @@
+{
+  "schema": 2,
+  "strategy": "REALIZED6_REFILL / INITIAL -7% / REFILL -5%",
+  "timezone": "Asia/Seoul",
+  "schedule": {
+    "daily": "Daily 17:00 KST",
+    "first": "Friday 17:00 KST",
+    "final": "Saturday 10:00 KST"
+  },
+  "daily": null,
+  "first": null,
+  "final": null,
+  "universe_count": 12
+}

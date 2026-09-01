@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="description" content="ACTIVE12 TREND 실전 운용 PWA" />
+  <title>ETF TREND LIVE V2</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icons/icon-192.png" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">ACTIVE12 · REALIZED6_REFILL</div>
+      <h1>ETF TREND LIVE V2</h1>
+      <div class="subline">최초 TREND -7% · REFILL -5% · 최대 6슬롯 · 확정기준자본/6</div>
+    </div>
+    <div class="top-actions">
+      <button id="refreshBtn" class="ghost">신호 새로고침</button>
+      <button id="backupBtn" class="ghost">백업</button>
+      <label class="button ghost" for="restoreInput">복원</label>
+      <input id="restoreInput" type="file" accept=".json,application/json" hidden />
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="status-hero card">
+      <div class="section-head">
+        <div>
+          <div class="section-title">오늘 17:00 KST 상태</div>
+          <div id="dailyStatusTime" class="section-note">상태 데이터 대기 중</div>
+        </div>
+        <div id="dataHealthPill" class="pill neutral">데이터 확인 중</div>
+      </div>
+      <div class="hero-grid">
+        <div class="hero-stat stop"><span>🔴 즉시 STOP</span><strong id="heroHardStop">0건</strong></div>
+        <div class="hero-stat exit"><span>🔴 다음 거래일 전량매도</span><strong id="heroWeeklyExit">0건</strong></div>
+        <div class="hero-stat buy"><span>🟢 신규 TREND 매수</span><strong id="heroNewBuy">0건</strong></div>
+        <div class="hero-stat refill"><span>🔵 월 REFILL</span><strong id="heroRefill">0건</strong></div>
+        <div class="hero-stat warn"><span>🟠 주봉 잠정 이탈</span><strong id="heroProvisional">0건</strong></div>
+      </div>
+      <div class="next-check-row">
+        <div><span class="k">다음 확인</span><span id="nextCheckText" class="v">—</span></div>
+        <div><span class="k">마지막 백업</span><span id="lastBackupText" class="v">없음</span></div>
+      </div>
+    </section>
+    <section id="staleBanner" class="banner warning hidden"></section>
+    <section id="messageBanner" class="banner hidden"></section>
+
+    <section class="version-panel card">
+      <div class="section-head">
+        <div>
+          <div class="section-title">주간 신호 버전</div>
+          <div class="section-note">한국시간 기준 · 금요일 17:00 1차 / 토요일 10:00 최종</div>
+        </div>
+        <div class="version-toggle" role="group" aria-label="신호 버전">
+          <button id="dailyVersionBtn" class="version-btn active">오늘 17시</button>
+          <button id="firstVersionBtn" class="version-btn">금 17시 1차</button>
+          <button id="finalVersionBtn" class="version-btn">토 10시 최종</button>
+        </div>
+      </div>
+      <div class="version-grid triple">
+        <div id="dailyVersionCard" class="version-card"></div>
+        <div id="firstVersionCard" class="version-card"></div>
+        <div id="finalVersionCard" class="version-card"></div>
+      </div>
+      <div id="changeSummary" class="change-summary"></div>
+    </section>
+
+    <section class="summary-grid">
+      <article class="metric card strong">
+        <div class="metric-label">확정기준자본</div>
+        <div id="confirmedCapital" class="metric-value">0원</div>
+        <div class="metric-help">현금 + 살아있는 lot 매입원가</div>
+      </article>
+      <article class="metric card">
+        <div class="metric-label">1슬롯 목표</div>
+        <div id="slotTarget" class="metric-value">0원</div>
+        <div class="metric-help">확정기준자본 ÷ 6</div>
+      </article>
+      <article class="metric card">
+        <div class="metric-label">현금</div>
+        <div id="cashValue" class="metric-value">0원</div>
+        <div id="cashRatio" class="metric-help">확정자본 대비 0.0%</div>
+      </article>
+      <article class="metric card">
+        <div class="metric-label">보유 슬롯</div>
+        <div id="slotCount" class="metric-value">0 / 6</div>
+        <div class="metric-help">ETF 종목 기준</div>
+      </article>
+      <article class="metric card">
+        <div class="metric-label">평가자산 · 참고</div>
+        <div id="marketEquity" class="metric-value">0원</div>
+        <div id="unrealizedPnl" class="metric-help">미실현 0원 · 슬롯 산정 제외</div>
+      </article>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <div class="section-title">오늘 할 일</div>
+          <div class="section-note">-7%/-5%는 장중 즉시 · 20주선은 금요일 완료주봉 확정 후 다음 거래일 시가</div>
+        </div>
+        <div class="button-row">
+          <button id="contributionBtn" class="primary">월입금</button>
+          <button id="cashAdjustBtn" class="ghost">현금 맞추기</button>
+          <button id="addLotBtn" class="ghost">보유 lot 등록</button>
+        </div>
+      </div>
+      <div id="actionList" class="action-list"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <div class="section-title">월 REFILL 계산</div>
+          <div class="section-note">현재 확정자본/6 대비 살아있는 매입원가 부족분을 현금 범위에서 pro-rata 배분</div>
+        </div>
+        <button id="refillCalcBtn" class="ghost">REFILL 다시 계산</button>
+      </div>
+      <div id="refillPanel"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <div class="section-title">ACTIVE12 신호</div>
+          <div class="section-note">
+            가격·20일선·20주선은 원 단위 · RSI/강도는 소수점 첫째 자리
+          </div>
+        </div>
+        <div id="signalAsOf" class="pill neutral">데이터 없음</div>
+      </div>
+      <div class="table-scroll">
+        <table class="signal-table">
+          <thead>
+            <tr>
+              <th>종목</th>
+              <th>상태</th>
+              <th class="num">종가</th>
+              <th class="num">20일선</th>
+              <th class="num">20주선</th>
+              <th class="num">STOP까지</th>
+              <th class="num">RSI</th>
+              <th class="num">강도</th>
+              <th>OBV</th>
+              <th>MACD</th>
+              <th>1차→최종</th>
+            </tr>
+          </thead>
+          <tbody id="signalTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <div class="section-title">보유 lot</div>
+          <div class="section-note">최초 lot STOP -7.0% · REFILL lot STOP -5.0% · 각 lot 독립</div>
+        </div>
+      </div>
+      <div id="lotList" class="lot-list"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <div class="section-title">거래·현금 원장</div>
+          <div class="section-note">증권계좌가 최종 원장입니다. 앱 입력값은 운용 보조용입니다.</div>
+        </div>
+        <button id="clearLedgerBtn" class="danger-ghost">원장 초기화</button>
+      </div>
+      <div class="table-scroll">
+        <table class="ledger-table">
+          <thead>
+            <tr>
+              <th>일시</th>
+              <th>구분</th>
+              <th>내용</th>
+              <th class="num">금액</th>
+            </tr>
+          </thead>
+          <tbody id="ledgerBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card rules-card">
+      <details>
+        <summary>최종 전략 규칙 보기</summary>
+        <div class="rules">
+          <p><strong>신규 TREND:</strong> 완료주봉 Close &gt; SMA20, OBV ≥ OBV 9주 signal, MACD ≥ signal 또는 MACD &gt; 0. 다음 실제 거래일 시가 진입.</p>
+          <p><strong>자금:</strong> 확정기준자본 = 현금 + 살아있는 lot 원가. 미실현손익은 슬롯 산정 제외. 목표 슬롯 = 확정기준자본/6.</p>
+          <p><strong>부분진입:</strong> 빈 슬롯이 있고 TREND ON이면 목표금액보다 현금이 적어도 가능한 현금으로 진입.</p>
+          <p><strong>손절:</strong> 최초 TREND lot -7%, 월 REFILL lot -5%. 요일과 무관하게 장중 작동하며 갭하락은 stop보다 불리하게 체결될 수 있음.</p>
+          <p><strong>REFILL:</strong> 월 외부입금 후 목표를 다시 계산. 보유 중이며 20주선 이탈 전인 종목의 매입원가 부족분을 pooled cash에서 pro-rata 배분. 손절 직후 즉시 재충전 금지.</p>
+          <p><strong>최종 청산:</strong> 완료주봉 Close &lt; SMA20이면 다음 실제 거래일 시가에 잔여 lot 전량 청산.</p>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <dialog id="genericDialog">
+    <form method="dialog" id="dialogForm">
+      <div class="dialog-head">
+        <h2 id="dialogTitle">입력</h2>
+        <button value="cancel" class="icon-btn" aria-label="닫기">×</button>
+      </div>
+      <div id="dialogBody"></div>
+      <div class="dialog-actions">
+        <button value="cancel" class="ghost">취소</button>
+        <button id="dialogConfirmBtn" value="default" class="primary">저장</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer>
+    <span>ETF TREND LIVE V2</span>
+    <span>·</span>
+    <span>브로커 계좌가 source of truth</span>
+  </footer>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
