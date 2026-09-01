@@ -8,7 +8,7 @@
     "final": "Saturday 10:00 KST"
   },
   "daily": {
-    "generated_at": "2026-09-01T14:21:46.439687+09:00",
+    "generated_at": "2026-09-01T17:07:09.668928+09:00",
     "week_ending": "2026-08-28",
     "version": "daily",
     "label": "오늘 상태 · 매일 17:00 KST",
@@ -788,5 +788,5 @@
     ]
   },
   "universe_count": 12,
-  "updated_at": "2026-09-01T14:39:19.623560+09:00"
+  "updated_at": "2026-09-01T17:07:09.668928+09:00"
 }
