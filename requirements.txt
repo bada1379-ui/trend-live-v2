@@ -1,4 +1,4 @@
 pandas>=2.2
 numpy>=1.26
-FinanceDataReader>=0.9.94
+finance-datareader>=0.9.94
 yfinance>=0.2.54
