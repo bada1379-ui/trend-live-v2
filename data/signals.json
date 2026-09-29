@@ -8,7 +8,7 @@
     "final": "Saturday 10:00 KST"
   },
   "daily": {
-    "generated_at": "2026-09-29T01:20:44.079402+09:00",
+    "generated_at": "2026-09-29T23:30:54.049296+09:00",
     "week_ending": "2026-09-25",
     "version": "daily",
     "label": "오늘 상태 · 매일 17:00 KST",
@@ -102,10 +102,10 @@
         "name": "TIGER 미국다우존스30",
         "source": "fdr_naver",
         "week_ending": "2026-09-25",
-        "close": 34360.0,
-        "sma20d": 34912.25,
-        "sma20w": 36830.75,
-        "rsi": 29.571734475374697,
+        "close": 34309.0,
+        "sma20d": 34860.7,
+        "sma20w": 36776.55,
+        "rsi": 29.561300010726114,
         "strength": 0.0,
         "obv_ok": false,
         "macd_ok": false,
@@ -113,10 +113,10 @@
         "exit_20w": true,
         "weekly_exit_confirmed": true,
         "provisional_20w_below": true,
-        "macd": -73.90068362504098,
-        "macd_signal": 428.7601485882389,
-        "obv": 8996032.0,
-        "obv_signal": 9077998.333333334
+        "macd": -73.8601016954999,
+        "macd_signal": 428.1006438991515,
+        "obv": 9008950.0,
+        "obv_signal": 9091033.222222222
       },
       {
         "ticker": "466920.KS",
@@ -788,5 +788,5 @@
     ]
   },
   "universe_count": 12,
-  "updated_at": "2026-09-29T01:20:44.079402+09:00"
+  "updated_at": "2026-09-29T23:30:54.049296+09:00"
 }
